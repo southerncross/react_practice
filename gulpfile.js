@@ -17,13 +17,14 @@ var path = {
 	DEST: 'dist',
 	DEST_BUILD: 'dist/build',
 	DEST_SRC: 'dist/src',
-	ENTRY_POINT: './src/js/app.js'
+	ENTRY_POINT: './src/js/main.js'
 };
 
 
 
 gulp.task('copy', function() {
-	return gulp.src(path.HTML)
+	return gulp
+		.src(path.HTML)
 		.pipe(gulp.dest(path.DEST));
 });
 
@@ -52,9 +53,6 @@ gulp.task('watch', function() {
 });
 
 
-gulp.task('default', ['watch']);
-
-
 gulp.task('build', function() {
 	return browserify({
 		entries: [path.ENTRY_POINT],
@@ -78,3 +76,6 @@ gulp.task('replaceHTML', function() {
 
 
 gulp.task('production', ['replaceHTML', 'build']);
+
+
+gulp.task('default', ['watch']);
