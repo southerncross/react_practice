@@ -1,81 +1,139 @@
-var gulp         = require('gulp'),
-    uglify       = require('gulp-uglify'),
-    react        = require('gulp-react'),
-    htmlreplace  = require('gulp-html-replace'),
-    source       = require('vinyl-source-stream'),
-    browserify   = require('browserify'),
-    watchify     = require('watchify'),
-    reactify     = require('reactify'),
-    streamify    = require('gulp-streamify');
+var gulp = require('gulp'),
+    sass = require('gulp-ruby-sass'),
+    minifycss = require('gulp-minify-css'),
+    uglify = require('gulp-uglify'),
+    react = require('gulp-react'),
+    htmlreplace = require('gulp-html-replace'),
+    source = require('vinyl-source-stream'),
+    browserify = require('browserify'),
+    watchify = require('watchify'),
+    reactify = require('reactify'),
+    clean = require('gulp-clean'),
+    streamify = require('gulp-streamify');
 
 
-
-var path = {
-	HTML: 'src/index.html',
-	MINIFIED_OUT: 'build.min.js',
-	OUT: 'build.js',
-	DEST: 'dist',
-	DEST_BUILD: 'dist/build',
-	DEST_SRC: 'dist/src',
-	ENTRY_POINT: './src/app.js'
+var PATH = {
+    DIST: 'dist',
+    HTML: {
+        SRC: 'src/index.html',
+        DST: 'dist'
+    },
+    CSS: {
+        SRC: 'src/sass/**/*.scss',
+        DST: 'dist/css'
+    },
+    JS: {
+        ENTRY_POINT: 'src/app.js',
+        BUILD: 'build.js',
+        BUILD_MINIFIED: 'build.min.js',
+        DST_DEV: 'dist/src',
+        DST_PROD: 'dist/build',
+    },
+    ASSETS: {
+        SRC: 'assets/**/*',
+        DST: 'dist',
+    }
 };
 
 
-
-gulp.task('copy', function() {
-	return gulp
-		.src(path.HTML)
-		.pipe(gulp.dest(path.DEST));
+gulp.task('clean', function () {
+    return gulp
+        .src([PATH.DIST], {read: false})
+        .pipe(clean({force: true}));
 });
 
 
-gulp.task('watch', function() {
-	gulp.watch(path.HTML, ['copy']);
-
-	var watcher = watchify(browserify({
-		entries: [path.ENTRY_POINT],
-		transform: [reactify],
-		debug: true,
-		cache: {},
-		packageCache: {},
-		fullPaths: true
-	}));
-
-	return watcher.on('update', function() {
-		watcher.bundle()
-			.pipe(source(path.OUT))
-			.pipe(gulp.dest(path.DEST_SRC));
-		console.log("Updated");
-	})
-		.bundle()
-		.pipe(source(path.OUT))
-		.pipe(gulp.dest(path.DEST_SRC));
+gulp.task('htmlDev', function () {
+    return gulp
+        .src(PATH.HTML.SRC)
+        .pipe(gulp.dest(PATH.HTML.DST));
 });
 
 
-gulp.task('build', function() {
-	return browserify({
-		entries: [path.ENTRY_POINT],
-		transform: [reactify]
-	})
-		.bundle()
-		.pipe(source(path.MINIFIED_OUT))
-		.pipe(streamify(uglify(path.MINIFIED_OUT)))
-		.pipe(gulp.dest(path.DEST_BUILD));
+gulp.task('htmlProd', function () {
+    return gulp
+        .src(PATH.HTML.SRC)
+        .pipe(htmlreplace({
+            js: 'build/' + PATH.JS.BUILD_MINIFIED
+        }))
+        .pipe(gulp.dest(PATH.HTML.DST));
 });
 
 
-gulp.task('replaceHTML', function() {
-	return gulp
-		.src(path.HTML)
-		.pipe(htmlreplace({
-			js: 'build/' + path.MINIFIED_OUT
-		}))
-		.pipe(gulp.dest(path.DEST));
+gulp.task('sassDev', function () {
+    return sass(PATH.CSS.SRC, {style: 'expanded'})
+        .pipe(gulp.dest(PATH.CSS.DST));
 });
 
 
-gulp.task('production', ['replaceHTML', 'build']);
+gulp.task('sassProd', function () {
+    return sass(PATH.CSS.SRC, {style: 'compressed'})
+        .pipe(gulp.dest(PATH.CSS.DST));
+});
 
 
-gulp.task('default', ['watch']);
+gulp.task('jsDev', function () {
+    return browserify({
+        entries: [PATH.JS.ENTRY_POINT],
+        transform: [reactify],
+        debug: true,
+        cache: {},
+        packageCache: {},
+        fullPaths: true
+    })
+        .bundle()
+        .pipe(source(PATH.JS.BUILD))
+        .pipe(streamify(uglify()))
+        .pipe(gulp.dest(PATH.JS.DST_DEV));
+});
+
+
+gulp.task('jsProd', function () {
+    return browserify({
+        entries: [PATH.JS.ENTRY_POINT],
+        transform: [reactify]
+    })
+        .bundle()
+        .pipe(source(PATH.JS.BUILD_MINIFIED))
+        .pipe(streamify(uglify()))
+        .pipe(gulp.dest(PATH.JS.DST_PROD));
+});
+
+
+gulp.task('copyAssets', function () {
+    return gulp
+        .src(PATH.ASSETS.SRC)
+        .pipe(gulp.dest(PATH.ASSETS.DST));
+});
+
+
+gulp.task('watch', function () {
+    gulp.watch(PATH.HTML.SRC, ['htmlDev']);
+    gulp.watch(PATH.CSS.SRC, ['sassDev']);
+    gulp.watch(PATH.ASSETS.SRC, ['copyAssets']);
+
+    var watcher = watchify(browserify({
+        entries: [PATH.JS.ENTRY_POINT],
+        transform: [reactify],
+        debug: true,
+        cache: {},
+        packageCache: {},
+        fullPaths: true
+    }));
+
+    return watcher.on('update', function () {
+        watcher.bundle()
+            .pipe(source(PATH.JS.BUILD))
+            .pipe(gulp.dest(PATH.JS.DST_DEV));
+        console.log("Updated");
+    })
+        .bundle()
+        .pipe(source(PATH.JS.BUILD))
+        .pipe(gulp.dest(PATH.JS.DST_DEV));
+});
+
+
+gulp.task('production', ['clean', 'htmlProd', 'sassProd', 'jsProd', 'copyAssets']);
+
+
+gulp.task('default', ['clean', 'htmlDev', 'sassDev', 'jsDev', 'copyAssets', 'watch']);

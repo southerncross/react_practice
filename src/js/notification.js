@@ -2,15 +2,29 @@ var React = require('react');
 
 var NotificationPanel = React.createClass({
     render: function () {
-        var departments = this.props.data.map(function (department) {
-            return <Department departmentName={department.departmentName} positions={department.positions}/>
+        var departmentList = this.props.data.map(function (department, index) {
+            return (
+                <Department
+                    id={'dept-' + index}
+                    departmentName={department.departmentName}
+                    positions={department.positions}
+                    />
+            );
         });
 
         return (
             <div>
-                <p>招聘职位<span>清空</span></p>
+                <div>
+                    <p>招聘职位
+                        <span className='right'>清空</span>
+                    </p>
+                </div>
 
-                {departments}
+                <div>
+                    <ul className='department-list'>
+                        {departmentList}
+                    </ul>
+                </div>
             </div>
         );
     }
@@ -19,7 +33,8 @@ var NotificationPanel = React.createClass({
 var Department = React.createClass({
     getInitialState: function () {
         return {
-            checked: false
+            checked: false,
+            collapsed: true
         };
     },
 
@@ -33,31 +48,64 @@ var Department = React.createClass({
         }.bind(this));
     },
 
+    toggleCollapsed: function() {
+        this.setState({
+            collapsed: !this.state.collapsed
+        });
+    },
+
     render: function () {
         var notificationSum = this.props.positions.reduce(function (sum, position) {
             return sum + position.notificationCount;
         }, 0);
-        var positions = this.props.positions.map(function (position, index) {
-            return <Position
-                positionName={position.positionName}
-                notificationCount={position.notificationCount}
-                checked={position.checked}
-                ref={'position-' + index}
-                />
-        });
+
+        var positionList = this.props.positions.map(function (position, index) {
+            return (
+                <Position
+                    id={this.props.id + '-position-' + index}
+                    positionName={position.positionName}
+                    notificationCount={position.notificationCount}
+                    checked={position.checked}
+                    ref={'position-' + index}
+                    />
+            );
+        }.bind(this));
+
+        var collapsedClass = {
+            true: 'icon-chevron-right',
+            false: 'icon-chevron-down'
+        };
+
+        var checkedClass = {
+            true: 'icon-check',
+            false: 'icon-check-empty'
+        };
 
         return (
-            <div>
-                <input
-                    type='checkbox'
-                    checked={this.state.checked}
-                    onChange={this.toggleChecked}
-                    />
+            <li>
+                <div className='checkbox'>
+                    <input
+                        id={this.props.id}
+                        type='checkbox'
+                        checked={this.state.checked}
+                        onChange={this.toggleChecked}
+                        />
+                    <label htmlFor={this.props.id}><i className={checkedClass[this.state.checked]}></i></label>
 
-                {this.props.departmentName}<span></span><span>{notificationSum}</span>
+                    <span className='department-toggle' onClick={this.toggleCollapsed}>
+                        {this.props.departmentName}
+                        <i className={collapsedClass[this.state.collapsed]}></i>
+                    </span>
 
-                {positions}
-            </div>
+                    <span className='right'>{notificationSum}</span>
+                </div>
+
+                <div className={'department-content' + (this.state.collapsed ? ' collapsed' : '')}>
+                    <ul className='position-list'>
+                        {positionList}
+                    </ul>
+                </div>
+            </li>
         );
     }
 });
@@ -80,16 +128,26 @@ var Position = React.createClass({
     },
 
     render: function () {
-        return (
-            <div>
-                <input
-                    type='checkbox'
-                    checked={this.state.checked}
-                    onChange={this.toggleChecked}
-                    />
+        var checkedClass = {
+            true: 'icon-check',
+            false: 'icon-check-empty'
+        };
 
-                {this.props.positionName}<span>{this.props.notificationCount}</span>
-            </div>
+        return (
+            <li>
+                <div className='checkbox'>
+                    <input
+                        id={this.props.id}
+                        type='checkbox'
+                        checked={this.state.checked}
+                        onChange={this.toggleChecked}
+                        />
+                    <label htmlFor={this.props.id}><i className={checkedClass[this.state.checked]}></i></label>
+
+                    <span>{this.props.positionName}</span>
+                    <span className='right'>{this.props.notificationCount}</span>
+                </div>
+            </li>
         );
     }
 });
