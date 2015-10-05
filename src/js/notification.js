@@ -1,6 +1,12 @@
 var React = require('react');
 
 var NotificationPanel = React.createClass({
+    clearChecked: function() {
+        this.props.data.forEach(function(department, index) {
+            this.refs['department-' + index].setChecked(false);
+        }.bind(this));
+    },
+
     render: function () {
         var departmentList = this.props.data.map(function (department, index) {
             return (
@@ -8,19 +14,19 @@ var NotificationPanel = React.createClass({
                     id={'dept-' + index}
                     departmentName={department.departmentName}
                     positions={department.positions}
+                    ref={'department-' + index}
                     />
             );
         });
 
         return (
             <div>
-                <div>
-                    <p>招聘职位
-                        <span className='right'>清空</span>
-                    </p>
+                <div className='notification-head'>
+                    <span>招聘职位</span>
+                    <span className='right' onClick={this.clearChecked}>清空</span>
                 </div>
 
-                <div>
+                <div className='notification-body'>
                     <ul className='department-list'>
                         {departmentList}
                     </ul>
@@ -39,16 +45,19 @@ var Department = React.createClass({
     },
 
     toggleChecked: function () {
-        var newChecked = !this.state.checked;
+        this.setChecked(!this.state.checked);
+    },
+
+    setChecked: function(checked) {
         this.setState({
-            checked: newChecked
+            checked: checked
         });
         this.props.positions.forEach(function (position, index) {
-            this.refs['position-' + index].setChecked(newChecked);
+            this.refs['position-' + index].setChecked(checked);
         }.bind(this));
     },
 
-    toggleCollapsed: function() {
+    toggleCollapsed: function () {
         this.setState({
             collapsed: !this.state.collapsed
         });
@@ -82,7 +91,7 @@ var Department = React.createClass({
         };
 
         return (
-            <li>
+            <li className='department-item'>
                 <div className='checkbox'>
                     <input
                         id={this.props.id}
@@ -92,12 +101,12 @@ var Department = React.createClass({
                         />
                     <label htmlFor={this.props.id}><i className={checkedClass[this.state.checked]}></i></label>
 
-                    <span className='department-toggle' onClick={this.toggleCollapsed}>
-                        {this.props.departmentName}
+                    <div className='department-toggle inline-block' onClick={this.toggleCollapsed}>
+                        <span>{this.props.departmentName}</span>
                         <i className={collapsedClass[this.state.collapsed]}></i>
-                    </span>
+                    </div>
 
-                    <span className='right'>{notificationSum}</span>
+                    <div className='count padded'>{notificationSum}</div>
                 </div>
 
                 <div className={'department-content' + (this.state.collapsed ? ' collapsed' : '')}>
@@ -134,7 +143,7 @@ var Position = React.createClass({
         };
 
         return (
-            <li>
+            <li className='position-item'>
                 <div className='checkbox'>
                     <input
                         id={this.props.id}
@@ -144,8 +153,11 @@ var Position = React.createClass({
                         />
                     <label htmlFor={this.props.id}><i className={checkedClass[this.state.checked]}></i></label>
 
-                    <span>{this.props.positionName}</span>
-                    <span className='right'>{this.props.notificationCount}</span>
+                    <div className='inline-block'>
+                        <span>{this.props.positionName}</span>
+                    </div>
+
+                    <div className='count'>{this.props.notificationCount}</div>
                 </div>
             </li>
         );
