@@ -119,7 +119,7 @@ var Department = React.createClass({
                         <i className={collapsedIcon}></i>
                     </div>
 
-                    <div className='count padded'>{notificationSum}</div>
+                    <div className='count padded'>{notificationSum > 999 ? '999+' : notificationSum}</div>
                 </div>
 
                 <div className={'department-body' + (this.state.collapsed ? ' collapsed' : '')}>
@@ -190,7 +190,7 @@ var Position = React.createClass({
                     <span>{this.props.positionName}</span>
                 </div>
 
-                <div className='count'>{this.props.notificationCount}</div>
+                <div className='count'>{this.props.notificationCount > 999 ? '999+' : this.props.notificationCount}</div>
             </div>
         );
     }
