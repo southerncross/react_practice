@@ -50,15 +50,16 @@ input[type="checkbox"] {
   display: none;
 
   + label {
+    width: 20px;
     display: inline-block;
     cursor: pointer;
-    width: 20px;
   }
 }
 
 #notification {
   width: 280px;
   height: 100vh;
+  overflow: scroll;
   padding: 0 20px;
   background: rgba(0, 0, 0, 0.3);
   position: absolute;
@@ -116,12 +117,21 @@ input[type="checkbox"] {
     }
 
     .department-toggle {
+      vertical-align: middle;
       line-height: 20px;
       cursor: pointer;
-      font-size: 17px;
+      font-size: 20px;
       max-width: 220px;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      span {
+        display: inline-block;
+        max-width: 160px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
 
       i {
         display: inline-block;
@@ -149,7 +159,7 @@ input[type="checkbox"] {
 }
 
 .position {
-  cursor: pointer;
+  //cursor: pointer;
 
   &.checked {
     color: white;
@@ -158,15 +168,24 @@ input[type="checkbox"] {
   &:hover {
     color: white;
   }
+
+  span {
+    max-width: 160px;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 .count {
+  font-size: 16px;
   float: right;
   display: inline-block;
   padding: 0 10px;
 
   &.padded {
-    padding: 2px 10px;
+    //padding: 2px 10px;
     background: rgba(0, 0, 0, 0.4);
     @include border-radius(10px);
   }
