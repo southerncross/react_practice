@@ -1,10 +1,10 @@
 var React = require('react');
 var Notification = require('./js/notification.js');
 
-var notifications = [
+var notificationList = [
     {
         departmentName: '工程研发部门',
-        positions: [
+        positionList: [
             {
                 positionName: 'Mac 开发工程师',
                 notificationCount: 9
@@ -17,7 +17,7 @@ var notifications = [
     },
     {
         departmentName: '产品设计部门',
-        positions: [
+        positionList: [
             {
                 positionName: '网页设计师',
                 notificationCount: 47
@@ -31,6 +31,6 @@ var notifications = [
 ];
 
 React.render(
-    <Notification data={notifications} />,
+    <Notification data={notificationList} />,
     document.getElementById('notification')
 );
