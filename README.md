@@ -12,7 +12,6 @@ Requirement
 
 - [Node](https://nodejs.org/en/)
 - [Gulp](http://gulpjs.com/)
-- [Ruby](https://www.ruby-lang.org/)
 
 Usage
 -----

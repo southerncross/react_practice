@@ -1,5 +1,5 @@
 var gulp = require('gulp'),
-    sass = require('gulp-ruby-sass'),
+    sass = require('gulp-sass'),
     minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify'),
     react = require('gulp-react'),
@@ -8,8 +8,10 @@ var gulp = require('gulp'),
     browserify = require('browserify'),
     watchify = require('watchify'),
     reactify = require('reactify'),
-    clean = require('gulp-clean'),
-    streamify = require('gulp-streamify');
+    del = require('del'),
+    vinylPaths = require('vinyl-paths'),
+    streamify = require('gulp-streamify'),
+    runSequence = require('run-sequence');
 
 
 var PATH = {
@@ -39,7 +41,8 @@ var PATH = {
 gulp.task('clean', function () {
     return gulp
         .src([PATH.DIST], {read: false})
-        .pipe(clean({force: true}));
+        .pipe(vinylPaths(del))
+        .pipe(gulp.dest(PATH.DIST));
 });
 
 
@@ -61,13 +64,17 @@ gulp.task('htmlProd', function () {
 
 
 gulp.task('sassDev', function () {
-    return sass(PATH.CSS.SRC, {style: 'expanded'})
+    return gulp
+        .src(PATH.CSS.SRC)
+        .pipe(sass().on('error', sass.logError))
         .pipe(gulp.dest(PATH.CSS.DST));
 });
 
 
 gulp.task('sassProd', function () {
-    return sass(PATH.CSS.SRC, {style: 'compressed'})
+    return gulp
+        .src(PATH.CSS.SRC)
+        .pipe(sass({outputStyle: 'compressed'}))
         .pipe(gulp.dest(PATH.CSS.DST));
 });
 
@@ -83,7 +90,6 @@ gulp.task('jsDev', function () {
     })
         .bundle()
         .pipe(source(PATH.JS.BUILD))
-        .pipe(streamify(uglify()))
         .pipe(gulp.dest(PATH.JS.DST_DEV));
 });
 
@@ -133,7 +139,29 @@ gulp.task('watch', function () {
 });
 
 
-gulp.task('production', ['clean', 'htmlProd', 'sassProd', 'jsProd', 'copyAssets']);
+gulp.task('production', function () {
+    runSequence(
+        'clean',
+        [
+            'htmlProd',
+            'sassProd',
+            'jsProd',
+            'copyAssets'
+        ]
+    );
+
+});
 
 
-gulp.task('default', ['clean', 'htmlDev', 'sassDev', 'jsDev', 'copyAssets', 'watch']);
+gulp.task('default', function () {
+    runSequence(
+        'clean',
+        [
+            'htmlDev',
+            'sassDev',
+            'jsDev',
+            'copyAssets',
+        ],
+        'watch'
+    );
+});
