@@ -89,6 +89,13 @@ var NotificationPanel = React.createClass({
 });
 
 var Department = React.createClass({
+    propTypes: {
+        deptName: React.PropTypes.string.isRequired,
+        posCount: React.PropTypes.number.isRequired,
+        toggleDept: React.PropTypes.func.isRequired,
+        togglePos: React.PropTypes.func.isRequired
+    },
+    
     getInitialState: function() {
         return {
             collapsed: true
@@ -158,6 +165,12 @@ var Department = React.createClass({
 });
 
 var Position = React.createClass({
+    propTypes: {
+        posName: React.PropTypes.string.isRequired,
+        count: React.PropTypes.number.isRequired,
+        togglePosChecked: React.PropTypes.func.isRequired
+    },
+    
     render: function () {
         var checkedIcon = this.props.checked ? 'icon-check' : 'icon-check-empty';
         var checkedClass = this.props.checked ? ' checked' : '';
