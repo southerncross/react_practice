@@ -13,7 +13,7 @@
   border-radius: $radius;
 }
 
-@mixin transition($property: all, $duration: .2s) {
+@mixin transition($property: all, $duration: .5s) {
   -webkit-transition: $property $duration ease;
   -moz-transition: $property $duration ease;
   -o-transition: $property $duration ease;
@@ -110,33 +110,26 @@ input[type="checkbox"] {
   .department-head {
     position: relative;
     line-height: 20px;
-    font-size: 17px;
+    font-size: 20px;
 
     &:hover {
       color: white;
     }
 
-    .department-toggle {
-      vertical-align: middle;
-      line-height: 20px;
+    i {
+      display: inline-block;
+      min-width: 20px;
       cursor: pointer;
-      font-size: 20px;
-      max-width: 220px;
-      overflow: hidden;
+      text-align: center;
+    }
+
+    .department-name {
+      display: inline-block;
       text-overflow: ellipsis;
-
-      span {
-        display: inline-block;
-        max-width: 160px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-      }
-
-      i {
-        display: inline-block;
-        margin-left: 5px;
-      }
+      max-width: 160px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
 
@@ -159,8 +152,6 @@ input[type="checkbox"] {
 }
 
 .position {
-  //cursor: pointer;
-
   &.checked {
     color: white;
   }
@@ -169,9 +160,15 @@ input[type="checkbox"] {
     color: white;
   }
 
+  i {
+    display: inline-block;
+    min-width: 15px;
+    cursor: pointer;
+  }
+
   span {
     max-width: 160px;
-    display: block;
+    display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

@@ -1,6 +1,21 @@
 var React = require('react');
 var Notification = require('./js/notification.js');
 
+function _convertData(raw) {
+    var res = {};
+    
+    raw.forEach(function(dept) {
+        var tmp = {};
+        
+        dept.positionList.forEach(function(pos) {
+            tmp[pos.positionName] = pos.notificationCount;
+        });
+        res[dept.departmentName] = tmp;
+    });
+
+    return res;
+}
+
 var notificationList = [
     {
         departmentName: '工程研发部门',
@@ -92,7 +107,8 @@ var notificationList = [
     }
 ];
 
+
 React.render(
-    <Notification data={notificationList} />,
+    <Notification data={_convertData(notificationList)} />,
     document.getElementById('notification')
 );
